@@ -131,4 +131,17 @@ public class SudokuChecker {
         return sum == 1022; //equal to 2^10 - 2, or 1111111110 in binary (we don't have a 0 in sudoku so the 2^0 isn't added)
     }
 
+
+    //example of one using two nested loops (not as efficient)
+    public static boolean checkWithTwoLoops(int[] list){
+        for(int i = 0; i < list.length; i++){
+            for(int j = i; j < list.length; j++){
+                if(list[i] == list[j]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
+
