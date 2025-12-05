@@ -14,7 +14,8 @@ public class SudokuChecker {
                 {3, 4, 5, 2, 8, 6, 1, 7, 9}
         };
         int[][] wrong = { //should return false
-                {5, 3, 4, 6, 7, 8, 9, 1, 5}, // row 0: duplicate 5
+                //{5, 3, 4, 6, 7, 8, 9, 1, 5}, // row 0: duplicate 5
+                {9, 9, 9, 9, 9, 9, 9, 9, 9}, //test for integer overflow
                 {6, 7, 2, 1, 9, 5, 3, 4, 6}, // row 1: duplicate 6
                 {1, 9, 8, 3, 4, 2, 5, 6, 7}, // row 2: ok
                 {8, 5, 9, 7, 6, 1, 4, 2, 3}, // row 3: ok
@@ -36,7 +37,7 @@ public class SudokuChecker {
         for (int i = 0; i < 9; i++) {
             //horizontal
             int[] row = new int[9];
-            for (int j = 0; j < 9; j++) { //can avoid this part entirely if you put the code in directly instead of using method
+            for (int j = 0; j < 9; j++) {
                 row[j] = grid[i][j];
             }
             if(!checkWithPrimeProducts(row)){ //alternatively can use checkWithPrimeProducts(grid[i])
@@ -45,7 +46,7 @@ public class SudokuChecker {
 
             //vertical
             int[] column = new int[9];
-            for (int j = 0; j < 9; j++) { //can avoid this part entirely if you put the code in directly instead of using method
+            for (int j = 0; j < 9; j++) {
                 column[j] = grid[j][i];
             }
             if(!checkWithCount(column)){
@@ -59,7 +60,7 @@ public class SudokuChecker {
                 int bigR = (i/3)*3;
                 int bigC = (1%3)*3;
 
-                int[] square = new int[9]; //can avoid this part entirely if you put the code in directly instead of using method
+                int[] square = new int[9];
                 for(int j = 0; j < 9; j++){ //small square
                     int r = (j/3)*3;
                     int c = (j%3)*3;
@@ -73,7 +74,7 @@ public class SudokuChecker {
 
         for (int rr = 0; rr < 9; rr+=3) { //big square row
             for (int cc = 0; cc < 9; cc+=3) { //big square column
-                int[] square = new int[9]; //can avoid this part entirely if you put the code in directly instead of using method
+                int[] square = new int[9];
                 int index = 0;
                 for (int r = rr; r < rr+3; r++) { //small square row
                     for (int c = cc; c < cc+3; c++) { //small square column
@@ -95,17 +96,21 @@ public class SudokuChecker {
     //methods to detect dupes in an int array, all O(n)
 
 
-    //precondition: in list, if n is max num in list and m is list.length, n^m must be less than 2^63-1, n>0
+    //precondition: in list, max in list must < 9
     public static boolean checkWithPrimeProducts(int[] list){
         int[] primes = {2,3,5,7,11,13,17,19,23}; //maps each number from 1-9 to a prime
-        long product = 1L; //must use long because 23^9 exceeds integer limit in worst case
-        //longs must have "L" at the end, that's why it's there
-        //longs are just a primitive type that can store larger numbers than int can
+        int product = 1;
         for (int x : list) {//x represents the num on sudoku board
             int index = x - 1; //-1 because array indexes start at 0
+            
+            if(product/100 * primes[index]  > Integer.MAX_VALUE/100){
+                return false;
+            }//prevents integer overflow, works because 100 > 23, avoids using long this way
+
+            
             product *= primes[index];
         }
-        return product == 223092870L;
+        return product == 223092870;
     }
 
     //precondiiton: list must not contain a number x outside of 0<x<10
@@ -122,7 +127,7 @@ public class SudokuChecker {
         return true;
     }
 
-    //precondition: list.length cannot exceed 31, 0<n<32
+    //precondition: list must at most contain 9 elements, and list must only contain ints from 1-9
     public static boolean checkWithBinary(int[] list){
         int sum = 0;
         for (int x : list) { //x represents the num on sudoku board
@@ -132,7 +137,7 @@ public class SudokuChecker {
     }
 
 
-    //example of one using two nested loops (not as efficient)
+    //example of one using two nested loops (unused in this program)
     public static boolean checkWithTwoLoops(int[] list){
         for(int i = 0; i < list.length; i++){
             for(int j = i; j < list.length; j++){
@@ -144,4 +149,5 @@ public class SudokuChecker {
         return true;
     }
 }
+
 
